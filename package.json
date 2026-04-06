@@ -1,0 +1,11 @@
+{
+  "name": "quantcode-e2e-test",
+  "version": "1.0.0",
+  "description": "E2E test repository for QuantCode autonomous agents",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "lint": "echo 'no linter configured'"
+  },
+  "devDependencies": {}
+}
