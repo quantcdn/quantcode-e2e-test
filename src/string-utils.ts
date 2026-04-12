@@ -11,9 +11,29 @@ export function reverse(str: string): string {
   return str.split("").reverse().join("")
 }
 
-// TODO: implement truncate function
-// Should truncate a string to maxLength and add "..." if truncated
-// Should not truncate in the middle of a word
+export function truncate(str: string, maxLength: number): string {
+  if (maxLength <= 0) return ""
+  if (str.length <= maxLength) return str
+  if (maxLength <= 3) return ".".repeat(maxLength)
+
+  // We need to fit text + "..." within maxLength
+  const available = maxLength - 3
+  const candidate = str.slice(0, available)
+
+  // If the character right after the cut is a space or we're at end, clean word boundary
+  if (str[available] === " " || available >= str.length) {
+    return candidate + "..."
+  }
+
+  // Find last space in candidate to avoid cutting mid-word
+  const lastSpace = candidate.lastIndexOf(" ")
+  if (lastSpace === -1) {
+    // No space found — truncate at character level
+    return candidate + "..."
+  }
+
+  return candidate.slice(0, lastSpace) + "..."
+}
 
 export function slugify(str: string): string {
   return str
