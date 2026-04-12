@@ -11,9 +11,15 @@ export function reverse(str: string): string {
   return str.split("").reverse().join("")
 }
 
-// TODO: implement truncate function
-// Should truncate a string to maxLength and add "..." if truncated
-// Should not truncate in the middle of a word
+export function truncate(str: string, maxLength: number): string {
+  if (!str || str.length <= maxLength) return str
+  if (maxLength <= 3) return "...".slice(0, maxLength)
+  // Find the last space at or before (maxLength - 3) to avoid mid-word cuts
+  const cutAt = maxLength - 3
+  const lastSpace = str.lastIndexOf(" ", cutAt)
+  const end = lastSpace > 0 ? lastSpace : cutAt
+  return str.slice(0, end) + "..."
+}
 
 export function slugify(str: string): string {
   return str
@@ -22,8 +28,7 @@ export function slugify(str: string): string {
     .replace(/^-|-$/g, "")
 }
 
-// BUG: This doesn't handle multiple consecutive spaces
 export function wordCount(str: string): number {
   if (!str.trim()) return 0
-  return str.split(" ").length
+  return str.trim().split(/\s+/).length
 }
