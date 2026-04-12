@@ -52,7 +52,33 @@ export class TaskManager {
     return true
   }
 
-  // TODO: implement remove method
-  // TODO: implement update method to change title/description/priority
-  // TODO: implement sortBy method (by priority, createdAt, or status)
+  remove(id: string): boolean {
+    return this.tasks.delete(id)
+  }
+
+  update(id: string, changes: Partial<Pick<Task, "title" | "description" | "priority">>): Task | undefined {
+    const task = this.tasks.get(id)
+    if (!task) return undefined
+    if (changes.title !== undefined) task.title = changes.title
+    if (changes.description !== undefined) task.description = changes.description
+    if (changes.priority !== undefined) task.priority = changes.priority
+    return task
+  }
+
+  sortBy(field: "priority" | "createdAt" | "status"): Task[] {
+    const tasks = Array.from(this.tasks.values())
+
+    if (field === "priority") {
+      const order: Record<Priority, number> = { high: 0, medium: 1, low: 2 }
+      return tasks.slice().sort((a, b) => order[a.priority] - order[b.priority])
+    }
+
+    if (field === "createdAt") {
+      return tasks.slice().sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    }
+
+    // status: pending > in_progress > completed
+    const order: Record<Status, number> = { pending: 0, in_progress: 1, completed: 2 }
+    return tasks.slice().sort((a, b) => order[a.status] - order[b.status])
+  }
 }
