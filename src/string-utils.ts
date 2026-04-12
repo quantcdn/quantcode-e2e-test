@@ -17,7 +17,7 @@ export function truncate(str: string, maxLength: number): string {
   // Find the last space at or before (maxLength - 3) to avoid mid-word cuts
   const cutAt = maxLength - 3
   const lastSpace = str.lastIndexOf(" ", cutAt)
-  const end = lastSpace > 0 ? lastSpace : cutAt
+  const end = lastSpace !== -1 ? lastSpace : cutAt
   return str.slice(0, end) + "..."
 }
 

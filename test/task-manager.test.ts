@@ -227,6 +227,22 @@ describe("TaskManager", () => {
       expect(updated.status).toBe("pending")
       expect(updated.createdAt).toBe(originalCreatedAt)
     })
+
+    test("empty object leaves task unchanged", () => {
+      const task = tm.add("A", "high", "desc")
+      const updated = tm.update(task.id, {})
+      expect(updated!.title).toBe("A")
+      expect(updated!.priority).toBe("high")
+      expect(updated!.description).toBe("desc")
+    })
+
+    test("passing description: undefined does NOT clear an existing description", () => {
+      // Current behavior: the `!== undefined` guard means undefined values are ignored.
+      // To clear a description, callers must use a separate mechanism (not yet implemented).
+      const task = tm.add("A", "medium", "existing desc")
+      tm.update(task.id, { description: undefined })
+      expect(tm.get(task.id)!.description).toBe("existing desc")
+    })
   })
 
   // ── sortBy ───────────────────────────────────────────────────────────────

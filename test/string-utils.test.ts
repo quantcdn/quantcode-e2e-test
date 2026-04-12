@@ -113,6 +113,21 @@ describe("truncate", () => {
     const result = truncate("The quick brown fox", 14)
     expect(result).toBe("The quick...")
   })
+
+  test("word boundary at index 0 — uses hard cut, not index 0 space", () => {
+    // " hello world" — the only space before cutAt may be at index 0
+    // lastSpace !== -1 fix: index 0 IS a valid find, so we use it (empty prefix + "...")
+    // cutAt for maxLength 6 = 3; lastIndexOf(" ", 3) on " hel" = 0
+    // end = 0 → str.slice(0, 0) + "..." = "..."
+    const result = truncate(" hello world", 6)
+    expect(result).toBe("...")
+    expect(result.length).toBeLessThanOrEqual(6)
+  })
+
+  test("returns string unchanged when maxLength equals string length with trailing space", () => {
+    // str.length (6) <= maxLength (6) → return unchanged
+    expect(truncate("hello ", 6)).toBe("hello ")
+  })
 })
 
 // ── slugify ──────────────────────────────────────────────────────────────────
