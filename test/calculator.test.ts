@@ -1,7 +1,5 @@
 import { describe, test, expect } from "bun:test"
-import { add, subtract, multiply } from "../src/calculator"
-
-// Note: divide is intentionally not tested — has a known bug
+import { add, subtract, multiply, divide } from "../src/calculator"
 
 describe("calculator", () => {
   test("adds two numbers", () => {
@@ -14,5 +12,13 @@ describe("calculator", () => {
 
   test("multiplies two numbers", () => {
     expect(multiply(4, 3)).toBe(12)
+  })
+
+  test("divides two numbers", () => {
+    expect(divide(10, 2)).toBe(5)
+  })
+
+  test("throws on division by zero", () => {
+    expect(() => divide(5, 0)).toThrow("Division by zero")
   })
 })
