@@ -15,7 +15,10 @@ export function multiply(a: number, b: number): number {
   return a * b
 }
 
-// BUG: Division by zero is not handled
+// Fixed: Division by zero throws an error
 export function divide(a: number, b: number): number {
+  if (b === 0) {
+    throw new Error("Division by zero is not allowed")
+  }
   return a / b
 }
