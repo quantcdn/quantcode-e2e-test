@@ -52,7 +52,20 @@ export class TaskManager {
     return true
   }
 
-  // TODO: implement remove method
-  // TODO: implement update method to change title/description/priority
-  // TODO: implement sortBy method (by priority, createdAt, or status)
+  // TODO: implement — remove a task by id, return true if removed, false if not found
+  remove(id: string): boolean {
+    throw new Error("not implemented")
+  }
+
+  // TODO: implement — update title/description/priority of a task
+  // return true if updated, false if not found
+  update(id: string, changes: Partial<Pick<Task, "title" | "description" | "priority">>): boolean {
+    throw new Error("not implemented")
+  }
+
+  // TODO: implement — return all tasks sorted by the given field
+  // priority sort order: high > medium > low
+  sortBy(field: "priority" | "createdAt" | "status"): Task[] {
+    throw new Error("not implemented")
+  }
 }

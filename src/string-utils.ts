@@ -11,9 +11,11 @@ export function reverse(str: string): string {
   return str.split("").reverse().join("")
 }
 
-// TODO: implement truncate function
-// Should truncate a string to maxLength and add "..." if truncated
-// Should not truncate in the middle of a word
+// TODO: implement truncate — should truncate at a word boundary, with "..."
+// counting toward maxLength. Return unchanged if str.length <= maxLength.
+export function truncate(str: string, maxLength: number): string {
+  throw new Error("not implemented")
+}
 
 export function slugify(str: string): string {
   return str
