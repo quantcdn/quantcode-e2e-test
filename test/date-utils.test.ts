@@ -16,7 +16,7 @@ describe("date-utils", () => {
     })
 
     test("1 minute ago (singular)", () => {
-      const d = new Date(base.getTime() - 90_000)
+      const d = new Date(base.getTime() - 61_000)
       expect(formatRelative(d, base)).toBe("1 minute ago")
     })
 
