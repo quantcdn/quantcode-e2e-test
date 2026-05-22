@@ -52,20 +52,27 @@ export class TaskManager {
     return true
   }
 
-  // TODO: implement — remove a task by id, return true if removed, false if not found
   remove(id: string): boolean {
-    throw new Error("not implemented")
+    return this.tasks.delete(id)
   }
 
-  // TODO: implement — update title/description/priority of a task
-  // return true if updated, false if not found
   update(id: string, changes: Partial<Pick<Task, "title" | "description" | "priority">>): boolean {
-    throw new Error("not implemented")
+    const task = this.tasks.get(id)
+    if (!task) return false
+    Object.assign(task, changes)
+    return true
   }
 
-  // TODO: implement — return all tasks sorted by the given field
-  // priority sort order: high > medium > low
   sortBy(field: "priority" | "createdAt" | "status"): Task[] {
-    throw new Error("not implemented")
+    const all = Array.from(this.tasks.values())
+    if (field === "priority") {
+      const order: Record<Priority, number> = { high: 0, medium: 1, low: 2 }
+      return all.slice().sort((a, b) => order[a.priority] - order[b.priority])
+    }
+    if (field === "createdAt") {
+      return all.slice().sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+    }
+    // status: alphabetical
+    return all.slice().sort((a, b) => a.status.localeCompare(b.status))
   }
 }
