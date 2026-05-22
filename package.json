@@ -7,5 +7,8 @@
     "test": "bun test",
     "lint": "echo 'no linter configured'"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "bun-types": "latest",
+    "typescript": "^5.4.0"
+  }
 }
