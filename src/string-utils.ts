@@ -11,10 +11,13 @@ export function reverse(str: string): string {
   return str.split("").reverse().join("")
 }
 
-// TODO: implement truncate — should truncate at a word boundary, with "..."
-// counting toward maxLength. Return unchanged if str.length <= maxLength.
 export function truncate(str: string, maxLength: number): string {
-  throw new Error("not implemented")
+  if (str.length <= maxLength) return str
+  if (maxLength <= 3) return str.slice(0, maxLength)
+  const limit = maxLength - 3
+  const boundary = str.lastIndexOf(" ", limit)
+  if (boundary <= 0) return str.slice(0, limit) + "..."
+  return str.slice(0, boundary) + "..."
 }
 
 export function slugify(str: string): string {
@@ -24,8 +27,7 @@ export function slugify(str: string): string {
     .replace(/^-|-$/g, "")
 }
 
-// BUG: This doesn't handle multiple consecutive spaces
 export function wordCount(str: string): number {
   if (!str.trim()) return 0
-  return str.split(" ").length
+  return str.trim().split(/\s+/).length
 }
