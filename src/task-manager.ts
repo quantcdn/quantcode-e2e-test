@@ -17,7 +17,7 @@ export interface Task {
 }
 
 export class TaskManager {
-  private tasks: Map<string, Task> = new Map()
+  private tasks: Task[] = []
   private nextId = 1
 
   add(title: string, priority: Priority = "medium", description?: string): Task {
@@ -29,43 +29,58 @@ export class TaskManager {
       status: "pending",
       createdAt: new Date(),
     }
-    this.tasks.set(task.id, task)
+    this.tasks.push(task)
     return task
   }
 
   get(id: string): Task | undefined {
-    return this.tasks.get(id)
+    return this.tasks.find((t) => t.id === id)
   }
 
   list(filter?: { status?: Status; priority?: Priority }): Task[] {
-    let result = Array.from(this.tasks.values())
-    if (filter?.status) result = result.filter((t) => t.status === filter.status)
-    if (filter?.priority) result = result.filter((t) => t.priority === filter.priority)
-    return result
+    if (!filter) return [...this.tasks]
+    return this.tasks.filter((t) => {
+      if (filter.status && t.status !== filter.status) return false
+      if (filter.priority && t.priority !== filter.priority) return false
+      return true
+    })
   }
 
   complete(id: string): boolean {
-    const task = this.tasks.get(id)
+    const task = this.get(id)
     if (!task) return false
     task.status = "completed"
     task.completedAt = new Date()
     return true
   }
 
-  // TODO: implement — remove a task by id, return true if removed, false if not found
   remove(id: string): boolean {
-    throw new Error("not implemented")
+    const index = this.tasks.findIndex((t) => t.id === id)
+    if (index === -1) return false
+    this.tasks.splice(index, 1)
+    return true
   }
 
-  // TODO: implement — update title/description/priority of a task
-  // return true if updated, false if not found
   update(id: string, changes: Partial<Pick<Task, "title" | "description" | "priority">>): boolean {
-    throw new Error("not implemented")
+    const task = this.get(id)
+    if (!task) return false
+    if (changes.title !== undefined) task.title = changes.title
+    if (changes.description !== undefined) task.description = changes.description
+    if (changes.priority !== undefined) task.priority = changes.priority
+    return true
   }
 
-  // TODO: implement — return all tasks sorted by the given field
-  // priority sort order: high > medium > low
   sortBy(field: "priority" | "createdAt" | "status"): Task[] {
-    throw new Error("not implemented")
+    const priorityOrder: Record<Priority, number> = { high: 0, medium: 1, low: 2 }
+    const statusOrder: Record<Status, number> = { pending: 0, in_progress: 1, completed: 2 }
+    return [...this.tasks].sort((a, b) => {
+      if (field === "priority") {
+        return priorityOrder[a.priority] - priorityOrder[b.priority]
+      }
+      if (field === "createdAt") {
+        return a.createdAt.getTime() - b.createdAt.getTime()
+      }
+      return statusOrder[a.status] - statusOrder[b.status]
+    })
   }
 }
