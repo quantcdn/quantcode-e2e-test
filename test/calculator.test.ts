@@ -22,3 +22,13 @@ describe("calculator", () => {
     expect(() => divide(10, 0)).toThrow()
   })
 })
+
+describe("divide", () => {
+  test("divides two numbers", () => {
+    expect(divide(10, 2)).toBe(5)
+  })
+
+  test("throws on division by zero", () => {
+    expect(() => divide(5, 0)).toThrow("Division by zero")
+  })
+})
