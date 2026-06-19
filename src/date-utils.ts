@@ -14,7 +14,7 @@ export function formatRelative(date: Date, now: Date = new Date()): string {
   const diffSec = diffMs / 1000
   const diffMin = diffSec / 60
   const diffHours = diffMin / 60
-  const diffDays = Math.floor(diffHours / 24) // BUG: should be Math.round
+  const diffDays = Math.round(diffHours / 24)
 
   if (Math.abs(diffSec) < 60) return "just now"
   if (Math.abs(diffMin) < 60) {
@@ -26,7 +26,7 @@ export function formatRelative(date: Date, now: Date = new Date()): string {
     return diffMs > 0 ? `${h} hour${h !== 1 ? "s" : ""} ago` : `in ${h} hour${h !== 1 ? "s" : ""}`
   }
   const d = Math.abs(diffDays)
-  return diffMs > 0 ? `${d} day${d !== 1 ? "s" : ""} ago` : `in ${d} day${d !== 1 ? "s" : ""}`
+  return diffMs > 0 ? `${d} day${d !== 1 ? "s" : ""} ago` : `in ${d} day${d !== 1 ? "s" : ""}` 
 }
 
 /**
