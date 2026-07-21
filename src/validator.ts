@@ -9,8 +9,7 @@
  * and rejects valid TLDs longer than 4 chars (e.g. .museum, .travel).
  */
 export function isEmail(value: string): boolean {
-  // BUG: too restrictive — missing subdomain support and long TLDs
-  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,4}$/.test(value)
+  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(value)
 }
 
 /**
@@ -19,13 +18,7 @@ export function isEmail(value: string): boolean {
  * BUG: rejects URLs with ports (e.g. http://localhost:3000)
  */
 export function isUrl(value: string): boolean {
-  try {
-    const url = new URL(value)
-    // BUG: only allows http/https but also rejects valid port usage
-    return (url.protocol === "http:" || url.protocol === "https:") && url.port === ""
-  } catch {
-    return false
-  }
+  return /^https?:\/\/[^\s/$.?#].[^\s]*$/.test(value)
 }
 
 /**
