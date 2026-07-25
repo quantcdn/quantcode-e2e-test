@@ -6,15 +6,15 @@
  * Format a date as a human-readable relative string.
  * e.g. "2 days ago", "just now", "in 3 hours"
  *
- * BUG: off-by-one — uses Math.floor where Math.round is needed for days,
- * causing "1 day ago" to appear for anything from 12h to 47h.
+ * Uses Math.round for day-level differences so that, e.g., 36 h rounds to
+ * "2 days ago" rather than "1 day ago".
  */
 export function formatRelative(date: Date, now: Date = new Date()): string {
   const diffMs = now.getTime() - date.getTime()
   const diffSec = diffMs / 1000
   const diffMin = diffSec / 60
   const diffHours = diffMin / 60
-  const diffDays = Math.floor(diffHours / 24) // BUG: should be Math.round
+  const diffDays = Math.round(diffHours / 24)
 
   if (Math.abs(diffSec) < 60) return "just now"
   if (Math.abs(diffMin) < 60) {
