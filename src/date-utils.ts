@@ -5,28 +5,28 @@
 /**
  * Format a date as a human-readable relative string.
  * e.g. "2 days ago", "just now", "in 3 hours"
- *
- * BUG: off-by-one — uses Math.floor where Math.round is needed for days,
- * causing "1 day ago" to appear for anything from 12h to 47h.
  */
 export function formatRelative(date: Date, now: Date = new Date()): string {
   const diffMs = now.getTime() - date.getTime()
-  const diffSec = diffMs / 1000
-  const diffMin = diffSec / 60
-  const diffHours = diffMin / 60
-  const diffDays = Math.floor(diffHours / 24) // BUG: should be Math.round
+  const isPast = diffMs > 0
+  const absSec = Math.abs(diffMs) / 1000
 
-  if (Math.abs(diffSec) < 60) return "just now"
-  if (Math.abs(diffMin) < 60) {
-    const m = Math.round(Math.abs(diffMin))
-    return diffMs > 0 ? `${m} minute${m !== 1 ? "s" : ""} ago` : `in ${m} minute${m !== 1 ? "s" : ""}`
+  const phrase = (value: number, unit: string): string => {
+    const quantity = `${value} ${unit}${value !== 1 ? "s" : ""}`
+    return isPast ? `${quantity} ago` : `in ${quantity}`
   }
-  if (Math.abs(diffHours) < 24) {
-    const h = Math.round(Math.abs(diffHours))
-    return diffMs > 0 ? `${h} hour${h !== 1 ? "s" : ""} ago` : `in ${h} hour${h !== 1 ? "s" : ""}`
-  }
-  const d = Math.abs(diffDays)
-  return diffMs > 0 ? `${d} day${d !== 1 ? "s" : ""} ago` : `in ${d} day${d !== 1 ? "s" : ""}`
+
+  if (absSec < 60) return "just now"
+
+  // Round within each unit *before* testing its upper bound, so the displayed
+  // number can never overflow its own unit (e.g. "60 minutes ago").
+  const minutes = Math.round(absSec / 60)
+  if (minutes < 60) return phrase(minutes, "minute")
+
+  const hours = Math.round(absSec / 3600)
+  if (hours < 24) return phrase(hours, "hour")
+
+  return phrase(Math.round(absSec / 86400), "day")
 }
 
 /**
