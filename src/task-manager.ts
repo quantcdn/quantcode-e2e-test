@@ -52,20 +52,48 @@ export class TaskManager {
     return true
   }
 
-  // TODO: implement — remove a task by id, return true if removed, false if not found
+  /** Remove a task by id. Returns true if removed, false if not found. */
   remove(id: string): boolean {
-    throw new Error("not implemented")
+    return this.tasks.delete(id)
   }
 
-  // TODO: implement — update title/description/priority of a task
-  // return true if updated, false if not found
+  /**
+   * Update the title, description or priority of a task.
+   * Only keys explicitly present in `changes` are applied.
+   * Returns true if updated, false if not found.
+   */
   update(id: string, changes: Partial<Pick<Task, "title" | "description" | "priority">>): boolean {
-    throw new Error("not implemented")
+    const task = this.tasks.get(id)
+    if (!task) return false
+    if ("title" in changes && changes.title !== undefined) task.title = changes.title
+    if ("description" in changes) task.description = changes.description
+    if ("priority" in changes && changes.priority !== undefined) task.priority = changes.priority
+    return true
   }
 
-  // TODO: implement — return all tasks sorted by the given field
-  // priority sort order: high > medium > low
+  /**
+   * Return all tasks sorted by the given field.
+   * priority: high > medium > low. createdAt: oldest first.
+   * status: pending > in_progress > completed.
+   */
   sortBy(field: "priority" | "createdAt" | "status"): Task[] {
-    throw new Error("not implemented")
+    const priorityRank: Record<Priority, number> = { high: 0, medium: 1, low: 2 }
+    const statusRank: Record<Status, number> = { pending: 0, in_progress: 1, completed: 2 }
+
+    return Array.from(this.tasks.values()).sort((a, b) => {
+      let delta: number
+      switch (field) {
+        case "priority":
+          delta = priorityRank[a.priority] - priorityRank[b.priority]
+          break
+        case "status":
+          delta = statusRank[a.status] - statusRank[b.status]
+          break
+        case "createdAt":
+          delta = a.createdAt.getTime() - b.createdAt.getTime()
+          break
+      }
+      return delta !== 0 ? delta : Number(a.id) - Number(b.id)
+    })
   }
 }
