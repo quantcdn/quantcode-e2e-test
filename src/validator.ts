@@ -3,26 +3,24 @@
  */
 
 /**
- * Returns true if the string is a valid email address.
+ * Returns true if the string looks like a valid email address.
  *
- * BUG: the regex does not allow subdomains (e.g. user@mail.example.com fails)
- * and rejects valid TLDs longer than 4 chars (e.g. .museum, .travel).
+ * This is a format check only, not a deliverability or security guarantee.
  */
 export function isEmail(value: string): boolean {
-  // BUG: too restrictive — missing subdomain support and long TLDs
-  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,4}$/.test(value)
+  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(value)
 }
 
 /**
- * Returns true if the string is a valid URL (http or https).
+ * Returns true if the string is a valid URL (http or https). Ports are allowed.
  *
- * BUG: rejects URLs with ports (e.g. http://localhost:3000)
+ * This is a format check only. It is not an SSRF guard — callers that pass the
+ * value to a server-side request must apply their own host allow-list.
  */
 export function isUrl(value: string): boolean {
   try {
     const url = new URL(value)
-    // BUG: only allows http/https but also rejects valid port usage
-    return (url.protocol === "http:" || url.protocol === "https:") && url.port === ""
+    return url.protocol === "http:" || url.protocol === "https:"
   } catch {
     return false
   }
