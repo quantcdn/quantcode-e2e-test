@@ -52,20 +52,47 @@ export class TaskManager {
     return true
   }
 
-  // TODO: implement — remove a task by id, return true if removed, false if not found
+  /**
+   * Remove a task by id. Returns true if a task was removed, false if not found.
+   */
   remove(id: string): boolean {
-    throw new Error("not implemented")
+    return this.tasks.delete(id)
   }
 
-  // TODO: implement — update title/description/priority of a task
-  // return true if updated, false if not found
+  /**
+   * Update the title, description and/or priority of a task.
+   * Returns true if the task was found and updated, false if not found.
+   * Only keys explicitly present in `changes` are applied.
+   */
   update(id: string, changes: Partial<Pick<Task, "title" | "description" | "priority">>): boolean {
-    throw new Error("not implemented")
+    const task = this.tasks.get(id)
+    if (!task) return false
+    if ("title" in changes && changes.title !== undefined) task.title = changes.title
+    if ("description" in changes) task.description = changes.description
+    if ("priority" in changes && changes.priority !== undefined) task.priority = changes.priority
+    return true
   }
 
-  // TODO: implement — return all tasks sorted by the given field
-  // priority sort order: high > medium > low
+  /**
+   * Return all tasks sorted by the given field.
+   * priority: high > medium > low. status: pending > in_progress > completed.
+   * createdAt: oldest first. Ties fall back to insertion order (id).
+   */
   sortBy(field: "priority" | "createdAt" | "status"): Task[] {
-    throw new Error("not implemented")
+    const priorityRank: Record<Priority, number> = { high: 0, medium: 1, low: 2 }
+    const statusRank: Record<Status, number> = { pending: 0, in_progress: 1, completed: 2 }
+
+    const byId = (a: Task, b: Task) => Number(a.id) - Number(b.id)
+
+    return Array.from(this.tasks.values()).sort((a, b) => {
+      switch (field) {
+        case "priority":
+          return priorityRank[a.priority] - priorityRank[b.priority] || byId(a, b)
+        case "status":
+          return statusRank[a.status] - statusRank[b.status] || byId(a, b)
+        case "createdAt":
+          return a.createdAt.getTime() - b.createdAt.getTime() || byId(a, b)
+      }
+    })
   }
 }
