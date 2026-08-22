@@ -2,27 +2,36 @@
  * Input validation utilities.
  */
 
+// Allowlist: RFC 5322 dot-atom local part, one or more DNS labels, and a
+// 2-63 char alphabetic TLD (covers .com through .museum / .travel).
+const EMAIL_RE =
+  /^[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}$/
+
 /**
  * Returns true if the string is a valid email address.
- *
- * BUG: the regex does not allow subdomains (e.g. user@mail.example.com fails)
- * and rejects valid TLDs longer than 4 chars (e.g. .museum, .travel).
+ * Supports subdomains and long TLDs. Enforces the RFC 5321 254-char limit.
  */
 export function isEmail(value: string): boolean {
-  // BUG: too restrictive — missing subdomain support and long TLDs
-  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,4}$/.test(value)
+  if (typeof value !== "string" || value.length === 0 || value.length > 254) return false
+  return EMAIL_RE.test(value)
 }
 
 /**
  * Returns true if the string is a valid URL (http or https).
- *
- * BUG: rejects URLs with ports (e.g. http://localhost:3000)
+ * Ports are permitted (e.g. http://localhost:3000). Any other scheme —
+ * including ftp:, file: and javascript: — is rejected.
  */
 export function isUrl(value: string): boolean {
+  if (typeof value !== "string") return false
   try {
     const url = new URL(value)
-    // BUG: only allows http/https but also rejects valid port usage
-    return (url.protocol === "http:" || url.protocol === "https:") && url.port === ""
+    if (url.protocol !== "http:" && url.protocol !== "https:") return false
+    if (!url.hostname) return false
+    if (url.port !== "") {
+      const port = Number(url.port)
+      if (!Number.isInteger(port) || port < 1 || port > 65535) return false
+    }
+    return true
   } catch {
     return false
   }
