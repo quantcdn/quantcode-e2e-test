@@ -4,25 +4,20 @@
 
 /**
  * Returns true if the string is a valid email address.
- *
- * BUG: the regex does not allow subdomains (e.g. user@mail.example.com fails)
- * and rejects valid TLDs longer than 4 chars (e.g. .museum, .travel).
+ * Allows subdomains (user@mail.example.com) and long TLDs (user@example.museum).
  */
 export function isEmail(value: string): boolean {
-  // BUG: too restrictive — missing subdomain support and long TLDs
-  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,4}$/.test(value)
+  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(value)
 }
 
 /**
  * Returns true if the string is a valid URL (http or https).
- *
- * BUG: rejects URLs with ports (e.g. http://localhost:3000)
+ * An explicit port is permitted (e.g. http://localhost:3000).
  */
 export function isUrl(value: string): boolean {
   try {
     const url = new URL(value)
-    // BUG: only allows http/https but also rejects valid port usage
-    return (url.protocol === "http:" || url.protocol === "https:") && url.port === ""
+    return url.protocol === "http:" || url.protocol === "https:"
   } catch {
     return false
   }
