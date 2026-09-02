@@ -52,20 +52,46 @@ export class TaskManager {
     return true
   }
 
-  // TODO: implement — remove a task by id, return true if removed, false if not found
+  /** Remove a task by id. Returns true if removed, false if not found. */
   remove(id: string): boolean {
-    throw new Error("not implemented")
+    return this.tasks.delete(id)
   }
 
-  // TODO: implement — update title/description/priority of a task
-  // return true if updated, false if not found
+  /**
+   * Update the title, description and/or priority of a task.
+   *
+   * Omitted keys are always left untouched. An explicit `undefined` behaves
+   * differently per field, because `title` and `priority` are required on Task
+   * while `description` is optional:
+   *   - `title` / `priority`: an explicit `undefined` is ignored, so a required
+   *     field can never be blanked out.
+   *   - `description`: an explicit `undefined` clears it.
+   *
+   * Returns true if updated, false if the task was not found.
+   */
   update(id: string, changes: Partial<Pick<Task, "title" | "description" | "priority">>): boolean {
-    throw new Error("not implemented")
+    const task = this.tasks.get(id)
+    if (!task) return false
+    if ("title" in changes && changes.title !== undefined) task.title = changes.title
+    if ("description" in changes) task.description = changes.description
+    if ("priority" in changes && changes.priority !== undefined) task.priority = changes.priority
+    return true
   }
 
-  // TODO: implement — return all tasks sorted by the given field
-  // priority sort order: high > medium > low
+  /** Return all tasks sorted by the given field, without mutating internal order. */
   sortBy(field: "priority" | "createdAt" | "status"): Task[] {
-    throw new Error("not implemented")
+    const priorityOrder: Record<Priority, number> = { high: 0, medium: 1, low: 2 }
+    const statusOrder: Record<Status, number> = { in_progress: 0, pending: 1, completed: 2 }
+
+    return Array.from(this.tasks.values()).sort((a, b) => {
+      switch (field) {
+        case "priority":
+          return priorityOrder[a.priority] - priorityOrder[b.priority]
+        case "status":
+          return statusOrder[a.status] - statusOrder[b.status]
+        case "createdAt":
+          return a.createdAt.getTime() - b.createdAt.getTime()
+      }
+    })
   }
 }
