@@ -52,20 +52,30 @@ export class TaskManager {
     return true
   }
 
-  // TODO: implement — remove a task by id, return true if removed, false if not found
   remove(id: string): boolean {
-    throw new Error("not implemented")
+    return this.tasks.delete(id)
   }
 
-  // TODO: implement — update title/description/priority of a task
-  // return true if updated, false if not found
   update(id: string, changes: Partial<Pick<Task, "title" | "description" | "priority">>): boolean {
-    throw new Error("not implemented")
+    const task = this.tasks.get(id)
+    if (!task) return false
+    if ("title" in changes && changes.title !== undefined) task.title = changes.title
+    if ("description" in changes) task.description = changes.description
+    if ("priority" in changes && changes.priority !== undefined) task.priority = changes.priority
+    return true
   }
 
-  // TODO: implement — return all tasks sorted by the given field
-  // priority sort order: high > medium > low
   sortBy(field: "priority" | "createdAt" | "status"): Task[] {
-    throw new Error("not implemented")
+    const priorityOrder: Record<Priority, number> = { high: 0, medium: 1, low: 2 }
+    const statusOrder: Record<Status, number> = { pending: 0, in_progress: 1, completed: 2 }
+    const result = Array.from(this.tasks.values())
+    switch (field) {
+      case "priority":
+        return result.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+      case "status":
+        return result.sort((a, b) => statusOrder[a.status] - statusOrder[b.status])
+      case "createdAt":
+        return result.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+    }
   }
 }
