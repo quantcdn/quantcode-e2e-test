@@ -52,20 +52,32 @@ export class TaskManager {
     return true
   }
 
-  // TODO: implement — remove a task by id, return true if removed, false if not found
   remove(id: string): boolean {
-    throw new Error("not implemented")
+    return this.tasks.delete(id)
   }
 
-  // TODO: implement — update title/description/priority of a task
-  // return true if updated, false if not found
   update(id: string, changes: Partial<Pick<Task, "title" | "description" | "priority">>): boolean {
-    throw new Error("not implemented")
+    const task = this.tasks.get(id)
+    if (!task) return false
+    if (changes.title !== undefined) task.title = changes.title
+    if (changes.description !== undefined) task.description = changes.description
+    if (changes.priority !== undefined) task.priority = changes.priority
+    return true
   }
 
-  // TODO: implement — return all tasks sorted by the given field
-  // priority sort order: high > medium > low
   sortBy(field: "priority" | "createdAt" | "status"): Task[] {
-    throw new Error("not implemented")
+    const priorityRank: Record<Priority, number> = { high: 0, medium: 1, low: 2 }
+    const statusRank: Record<Status, number> = { in_progress: 0, pending: 1, completed: 2 }
+
+    return Array.from(this.tasks.values()).sort((a, b) => {
+      switch (field) {
+        case "priority":
+          return priorityRank[a.priority] - priorityRank[b.priority]
+        case "createdAt":
+          return a.createdAt.getTime() - b.createdAt.getTime()
+        case "status":
+          return statusRank[a.status] - statusRank[b.status]
+      }
+    })
   }
 }
