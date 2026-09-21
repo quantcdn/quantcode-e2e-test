@@ -2,27 +2,43 @@
  * Input validation utilities.
  */
 
+const DOMAIN_LABEL = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/
+const TLD = /^[a-zA-Z]{2,63}$/
+
 /**
  * Returns true if the string is a valid email address.
  *
- * BUG: the regex does not allow subdomains (e.g. user@mail.example.com fails)
- * and rejects valid TLDs longer than 4 chars (e.g. .museum, .travel).
+ * Validated by splitting on "@" and checking each dot-separated domain label
+ * individually. This accepts subdomains (user@mail.example.com) and TLDs
+ * longer than four characters (user@example.museum), both of which the
+ * previous single-pattern check rejected. Length limits follow RFC 5321:
+ * 254 characters total, 64 for the local part.
  */
 export function isEmail(value: string): boolean {
-  // BUG: too restrictive — missing subdomain support and long TLDs
-  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,4}$/.test(value)
+  if (!value || value.length > 254) return false
+
+  const parts = value.split("@")
+  if (parts.length !== 2) return false
+
+  const [local, domain] = parts
+  if (!local || local.length > 64 || /\s/.test(local)) return false
+  if (!domain || /\s/.test(domain)) return false
+
+  const labels = domain.split(".")
+  if (labels.length < 2) return false
+  if (!labels.every((label) => DOMAIN_LABEL.test(label))) return false
+
+  return TLD.test(labels[labels.length - 1])
 }
 
 /**
  * Returns true if the string is a valid URL (http or https).
- *
- * BUG: rejects URLs with ports (e.g. http://localhost:3000)
+ * Ports are permitted (e.g. http://localhost:3000).
  */
 export function isUrl(value: string): boolean {
   try {
     const url = new URL(value)
-    // BUG: only allows http/https but also rejects valid port usage
-    return (url.protocol === "http:" || url.protocol === "https:") && url.port === ""
+    return url.protocol === "http:" || url.protocol === "https:"
   } catch {
     return false
   }
