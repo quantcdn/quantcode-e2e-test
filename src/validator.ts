@@ -5,24 +5,27 @@
 /**
  * Returns true if the string is a valid email address.
  *
- * BUG: the regex does not allow subdomains (e.g. user@mail.example.com fails)
- * and rejects valid TLDs longer than 4 chars (e.g. .museum, .travel).
+ * The local part is matched permissively (dot-separated segments of any
+ * character except whitespace, "@" and control characters) so internationalised
+ * addresses such as josé@example.com are accepted. The domain is matched
+ * strictly: dot-separated LDH labels and a 2–63 character alphabetic TLD,
+ * which supports subdomains and long TLDs (.museum, .travel).
  */
 export function isEmail(value: string): boolean {
-  // BUG: too restrictive — missing subdomain support and long TLDs
-  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,4}$/.test(value)
+  if (value.length > 254) return false
+  const localPart = String.raw`[^\s@.\x00-\x1F\x7F]+(?:\.[^\s@.\x00-\x1F\x7F]+)*`
+  const domain = String.raw`(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,63}`
+  return new RegExp(`^${localPart}@${domain}$`, "u").test(value)
 }
 
 /**
- * Returns true if the string is a valid URL (http or https).
- *
- * BUG: rejects URLs with ports (e.g. http://localhost:3000)
+ * Returns true if the string is a valid URL using the http or https scheme.
+ * Ports are permitted (e.g. http://localhost:3000).
  */
 export function isUrl(value: string): boolean {
   try {
     const url = new URL(value)
-    // BUG: only allows http/https but also rejects valid port usage
-    return (url.protocol === "http:" || url.protocol === "https:") && url.port === ""
+    return url.protocol === "http:" || url.protocol === "https:"
   } catch {
     return false
   }
