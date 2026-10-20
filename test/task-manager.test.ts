@@ -33,6 +33,54 @@ describe("TaskManager", () => {
     expect(mgr.list({ status: "pending" })).toHaveLength(0)
   })
 
+  test("filters by priority", () => {
+    mgr.add("Urgent", "high")
+    mgr.add("Routine", "low")
+    mgr.add("Also urgent", "high")
+    expect(mgr.list({ priority: "high" })).toHaveLength(2)
+    expect(mgr.list({ priority: "low" })).toHaveLength(1)
+    expect(mgr.list({ priority: "medium" })).toHaveLength(0)
+  })
+
+  test("filters by status and priority together", () => {
+    const done = mgr.add("Done and urgent", "high")
+    mgr.add("Open and urgent", "high")
+    mgr.add("Open and routine", "low")
+    mgr.complete(done.id)
+
+    const pendingHigh = mgr.list({ status: "pending", priority: "high" })
+    expect(pendingHigh).toHaveLength(1)
+    expect(pendingHigh[0].title).toBe("Open and urgent")
+  })
+
+  test("empty filter object returns all tasks", () => {
+    mgr.add("Task 1")
+    mgr.add("Task 2")
+    expect(mgr.list({})).toHaveLength(2)
+  })
+
+  test("defaults priority to medium and leaves description undefined", () => {
+    const t = mgr.add("No options given")
+    expect(t.priority).toBe("medium")
+    expect(t.description).toBeUndefined()
+  })
+
+  test("stores the description when provided", () => {
+    const t = mgr.add("With notes", "low", "some notes")
+    expect(t.description).toBe("some notes")
+    expect(mgr.get(t.id)?.description).toBe("some notes")
+  })
+
+  test("assigns unique ids", () => {
+    const first = mgr.add("First")
+    const second = mgr.add("Second")
+    expect(first.id).not.toBe(second.id)
+  })
+
+  test("get returns undefined for unknown id", () => {
+    expect(mgr.get("999")).toBeUndefined()
+  })
+
   test("completes a task", () => {
     const t = mgr.add("Task 1")
     expect(mgr.complete(t.id)).toBe(true)
