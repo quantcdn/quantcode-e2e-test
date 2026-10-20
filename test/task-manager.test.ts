@@ -33,6 +33,18 @@ describe("TaskManager", () => {
     expect(mgr.list({ status: "pending" })).toHaveLength(0)
   })
 
+  test("filters by status and priority combined", () => {
+    const highDone = mgr.add("High done", "high")
+    mgr.add("High pending", "high")
+    const lowDone = mgr.add("Low done", "low")
+    mgr.complete(highDone.id)
+    mgr.complete(lowDone.id)
+
+    const result = mgr.list({ status: "completed", priority: "high" })
+    expect(result).toHaveLength(1)
+    expect(result[0].id).toBe(highDone.id)
+  })
+
   test("completes a task", () => {
     const t = mgr.add("Task 1")
     expect(mgr.complete(t.id)).toBe(true)
