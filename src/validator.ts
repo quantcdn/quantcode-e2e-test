@@ -5,24 +5,25 @@
 /**
  * Returns true if the string is a valid email address.
  *
- * BUG: the regex does not allow subdomains (e.g. user@mail.example.com fails)
- * and rejects valid TLDs longer than 4 chars (e.g. .museum, .travel).
+ * Accepts subdomains (user@mail.example.com) and TLDs of any realistic length
+ * (user@example.museum). Uses an allowlist of permitted characters and caps
+ * length at the RFC 5321 maximum of 254 characters.
  */
 export function isEmail(value: string): boolean {
-  // BUG: too restrictive — missing subdomain support and long TLDs
-  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,4}$/.test(value)
+  if (value.length > 254) return false
+  return /^[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,63}$/.test(value)
 }
 
 /**
- * Returns true if the string is a valid URL (http or https).
+ * Returns true if the string is a valid http or https URL.
  *
- * BUG: rejects URLs with ports (e.g. http://localhost:3000)
+ * An explicit port is permitted (e.g. http://localhost:3000); only the
+ * protocol is restricted, via an allowlist.
  */
 export function isUrl(value: string): boolean {
   try {
     const url = new URL(value)
-    // BUG: only allows http/https but also rejects valid port usage
-    return (url.protocol === "http:" || url.protocol === "https:") && url.port === ""
+    return url.protocol === "http:" || url.protocol === "https:"
   } catch {
     return false
   }
