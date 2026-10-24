@@ -8,6 +8,7 @@ E2E test repository for QuantCode autonomous agents.
 - `src/string-utils.ts` — String utility functions (has a word count bug, missing truncate function)
 - `src/task-manager.ts` — Task management class (missing remove, update, and sortBy methods)
 - `test/` — Test files (incomplete coverage)
+- `test/task-manager.test.ts` — Unit tests for the task manager, covering id assignment/default priority/description, combined status+priority filtering, and that `list()` returns a copy
 
 ## Running Tests
 
