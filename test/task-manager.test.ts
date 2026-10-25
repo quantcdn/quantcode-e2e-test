@@ -33,6 +33,39 @@ describe("TaskManager", () => {
     expect(mgr.list({ status: "pending" })).toHaveLength(0)
   })
 
+  test("add defaults priority to medium and stores optional description", () => {
+    const t1 = mgr.add("No extras")
+    expect(t1.priority).toBe("medium")
+    expect(t1.description).toBeUndefined()
+    expect(t1.completedAt).toBeUndefined()
+
+    const t2 = mgr.add("With extras", "high", "Some detail")
+    expect(t2.priority).toBe("high")
+    expect(t2.description).toBe("Some detail")
+    expect(t2.id).not.toBe(t1.id)
+  })
+
+  test("filters by priority", () => {
+    mgr.add("Low", "low")
+    mgr.add("High 1", "high")
+    mgr.add("High 2", "high")
+    const high = mgr.list({ priority: "high" })
+    expect(high).toHaveLength(2)
+    expect(high.every((t) => t.priority === "high")).toBe(true)
+    expect(mgr.list({ priority: "medium" })).toHaveLength(0)
+  })
+
+  test("combines status and priority filters", () => {
+    const a = mgr.add("High done", "high")
+    mgr.add("High pending", "high")
+    const c = mgr.add("Low done", "low")
+    mgr.complete(a.id)
+    mgr.complete(c.id)
+    const result = mgr.list({ status: "completed", priority: "high" })
+    expect(result).toHaveLength(1)
+    expect(result[0].id).toBe(a.id)
+  })
+
   test("completes a task", () => {
     const t = mgr.add("Task 1")
     expect(mgr.complete(t.id)).toBe(true)
