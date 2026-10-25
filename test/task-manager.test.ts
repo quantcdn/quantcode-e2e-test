@@ -33,6 +33,41 @@ describe("TaskManager", () => {
     expect(mgr.list({ status: "pending" })).toHaveLength(0)
   })
 
+  test("add assigns unique sequential ids, defaults priority to medium, and stores description", () => {
+    const t1 = mgr.add("First")
+    const t2 = mgr.add("Second", "high", "Details")
+    expect(t1.id).not.toBe(t2.id)
+    expect(Number(t2.id)).toBe(Number(t1.id) + 1)
+    expect(t1.priority).toBe("medium")
+    expect(t1.description).toBeUndefined()
+    expect(t1.completedAt).toBeUndefined()
+    expect(t1.createdAt).toBeInstanceOf(Date)
+    expect(t2.priority).toBe("high")
+    expect(t2.description).toBe("Details")
+  })
+
+  test("list applies status and priority filters together", () => {
+    const highDone = mgr.add("High done", "high")
+    mgr.add("High pending", "high")
+    const lowDone = mgr.add("Low done", "low")
+    mgr.complete(highDone.id)
+    mgr.complete(lowDone.id)
+    expect(mgr.list({ priority: "high" })).toHaveLength(2)
+    const result = mgr.list({ status: "completed", priority: "high" })
+    expect(result).toHaveLength(1)
+    expect(result[0].id).toBe(highDone.id)
+    expect(mgr.list({ status: "in_progress", priority: "high" })).toHaveLength(0)
+  })
+
+  test("mutating the array returned by list does not affect stored tasks", () => {
+    mgr.add("Task 1")
+    mgr.add("Task 2")
+    const listed = mgr.list()
+    listed.pop()
+    listed.length = 0
+    expect(mgr.list()).toHaveLength(2)
+  })
+
   test("completes a task", () => {
     const t = mgr.add("Task 1")
     expect(mgr.complete(t.id)).toBe(true)
