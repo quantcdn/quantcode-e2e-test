@@ -14,3 +14,5 @@ E2E test repository for QuantCode autonomous agents.
 ```bash
 bun test
 ```
+
+Hello world!

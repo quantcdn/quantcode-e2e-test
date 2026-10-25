@@ -88,4 +88,30 @@ describe("TaskManager", () => {
     expect(sorted[0].id).toBe(t1.id)
     expect(sorted[1].id).toBe(t2.id)
   })
+
+  test("add defaults priority to medium and stores description and createdAt", () => {
+    const t = mgr.add("Task", undefined, "Details")
+    expect(t.priority).toBe("medium")
+    expect(t.description).toBe("Details")
+    expect(t.createdAt).toBeInstanceOf(Date)
+    expect(t.completedAt).toBeUndefined()
+  })
+
+  test("list combines priority and status filters", () => {
+    const a = mgr.add("A", "high")
+    mgr.add("B", "high")
+    const c = mgr.add("C", "low")
+    mgr.complete(a.id)
+    mgr.complete(c.id)
+    expect(mgr.list({ priority: "high" })).toHaveLength(2)
+    const result = mgr.list({ priority: "high", status: "completed" })
+    expect(result).toHaveLength(1)
+    expect(result[0].id).toBe(a.id)
+  })
+
+  test("assigns unique ids and get returns undefined for unknown id", () => {
+    const ids = [mgr.add("1").id, mgr.add("2").id, mgr.add("3").id]
+    expect(new Set(ids).size).toBe(3)
+    expect(mgr.get("999")).toBeUndefined()
+  })
 })
