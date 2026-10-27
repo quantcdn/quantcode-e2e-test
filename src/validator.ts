@@ -2,27 +2,32 @@
  * Input validation utilities.
  */
 
+/** Maximum length of an email address (RFC 5321). */
+const EMAIL_MAX_LENGTH = 254
+
 /**
  * Returns true if the string is a valid email address.
  *
- * BUG: the regex does not allow subdomains (e.g. user@mail.example.com fails)
- * and rejects valid TLDs longer than 4 chars (e.g. .museum, .travel).
+ * Accepts subdomains (user@mail.example.com) and TLDs of any length
+ * (user@example.museum). The local part permits any non-whitespace, non-@
+ * character, so addresses such as o'brien@mail.gov.au and user!name@x.com are
+ * not rejected. An upper length bound is enforced before matching.
  */
 export function isEmail(value: string): boolean {
-  // BUG: too restrictive — missing subdomain support and long TLDs
-  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,4}$/.test(value)
+  if (!value || value.length > EMAIL_MAX_LENGTH) return false
+  return /^[^\s@]+@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$/.test(
+    value,
+  )
 }
 
 /**
- * Returns true if the string is a valid URL (http or https).
- *
- * BUG: rejects URLs with ports (e.g. http://localhost:3000)
+ * Returns true if the string is a valid URL using the http or https scheme.
+ * An explicit port (e.g. http://localhost:3000) is permitted.
  */
 export function isUrl(value: string): boolean {
   try {
     const url = new URL(value)
-    // BUG: only allows http/https but also rejects valid port usage
-    return (url.protocol === "http:" || url.protocol === "https:") && url.port === ""
+    return url.protocol === "http:" || url.protocol === "https:"
   } catch {
     return false
   }
