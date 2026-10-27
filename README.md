@@ -9,8 +9,20 @@ E2E test repository for QuantCode autonomous agents.
 - `src/task-manager.ts` — Task management class (missing remove, update, and sortBy methods)
 - `test/` — Test files (incomplete coverage)
 
-## Running Tests
+## Testing
+
+Tests use the [Bun](https://bun.sh) test runner (`bun:test`) and live in `test/`.
 
 ```bash
-bun test
+bun install                        # install dev dependencies (typescript, bun-types)
+bun test                           # run the full suite (also: npm test)
+bun test test/calculator.test.ts   # run a single file
 ```
+
+Typecheck (no script defined; uses `tsconfig.json`):
+
+```bash
+bunx tsc --noEmit
+```
+
+Note: some tests currently fail because they cover known bugs and missing features in `src/`.
