@@ -8,6 +8,11 @@
  *
  * BUG: off-by-one — uses Math.floor where Math.round is needed for days,
  * causing "1 day ago" to appear for anything from 12h to 47h.
+ *
+ * @param date - The date to describe.
+ * @param now - The reference point to compare against. Defaults to the current time.
+ * @returns "just now" within a minute, otherwise a minutes, hours or days string,
+ *   suffixed "ago" for past dates or prefixed "in" for future dates.
  */
 export function formatRelative(date: Date, now: Date = new Date()): string {
   const diffMs = now.getTime() - date.getTime()
@@ -30,7 +35,11 @@ export function formatRelative(date: Date, now: Date = new Date()): string {
 }
 
 /**
- * Returns true if two dates fall on the same calendar day.
+ * Returns true if two dates fall on the same calendar day (local time).
+ *
+ * @param a - The first date.
+ * @param b - The second date.
+ * @returns `true` if both dates share the same year, month and day, otherwise `false`.
  */
 export function isSameDay(a: Date, b: Date): boolean {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
@@ -38,6 +47,10 @@ export function isSameDay(a: Date, b: Date): boolean {
 
 /**
  * Add a number of days to a date (returns a new Date).
+ *
+ * @param date - The starting date; it is not mutated.
+ * @param days - The number of days to add; negative values subtract.
+ * @returns A new Date offset by the given number of days.
  */
 export function addDays(date: Date, days: number): Date {
   const result = new Date(date)
