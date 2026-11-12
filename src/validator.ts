@@ -7,6 +7,9 @@
  *
  * BUG: the regex does not allow subdomains (e.g. user@mail.example.com fails)
  * and rejects valid TLDs longer than 4 chars (e.g. .museum, .travel).
+ *
+ * @param value - The string to test.
+ * @returns `true` if the string matches the email pattern, otherwise `false`.
  */
 export function isEmail(value: string): boolean {
   // BUG: too restrictive — missing subdomain support and long TLDs
@@ -17,6 +20,11 @@ export function isEmail(value: string): boolean {
  * Returns true if the string is a valid URL (http or https).
  *
  * BUG: rejects URLs with ports (e.g. http://localhost:3000)
+ *
+ * @param value - The string to test.
+ * @returns `true` if the string parses as an http(s) URL with no port other than the
+ *   protocol's default (the URL parser drops default ports, so `http://x.com:80` passes),
+ *   otherwise `false`. Unparseable input returns `false` rather than throwing.
  */
 export function isUrl(value: string): boolean {
   try {
@@ -31,6 +39,11 @@ export function isUrl(value: string): boolean {
 /**
  * Returns true if the string contains only alphanumeric characters and underscores,
  * starts with a letter, and is between minLen and maxLen characters.
+ *
+ * @param value - The string to test.
+ * @param minLen - Minimum permitted length (inclusive). Defaults to 3.
+ * @param maxLen - Maximum permitted length (inclusive). Defaults to 20.
+ * @returns `true` if the string is a valid username, otherwise `false`.
  */
 export function isUsername(value: string, minLen = 3, maxLen = 20): boolean {
   if (value.length < minLen || value.length > maxLen) return false
@@ -40,6 +53,9 @@ export function isUsername(value: string, minLen = 3, maxLen = 20): boolean {
 /**
  * Returns true if the string is a valid Australian phone number.
  * Accepts formats: 04XX XXX XXX, +614XX XXX XXX, (02) XXXX XXXX, 02 XXXX XXXX
+ *
+ * @param value - The phone number to test; spaces, hyphens, dots and parentheses are ignored.
+ * @returns `true` if the cleaned number is a valid Australian number, otherwise `false`.
  */
 export function isAustralianPhone(value: string): boolean {
   const cleaned = value.replace(/[\s\-().]/g, "")
