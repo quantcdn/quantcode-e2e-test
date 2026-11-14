@@ -14,7 +14,15 @@ export function reverse(str: string): string {
 // TODO: implement truncate — should truncate at a word boundary, with "..."
 // counting toward maxLength. Return unchanged if str.length <= maxLength.
 export function truncate(str: string, maxLength: number): string {
-  throw new Error("not implemented")
+  if (str.length <= maxLength) return str
+  const ellipsis = "..."
+  const avail = Math.max(0, maxLength - ellipsis.length)
+  let cut = str.slice(0, avail)
+  if (str.charAt(avail) !== " ") {
+    const space = cut.lastIndexOf(" ")
+    if (space > 0) cut = cut.slice(0, space)
+  }
+  return cut.trimEnd() + ellipsis
 }
 
 export function slugify(str: string): string {
@@ -27,5 +35,5 @@ export function slugify(str: string): string {
 // BUG: This doesn't handle multiple consecutive spaces
 export function wordCount(str: string): number {
   if (!str.trim()) return 0
-  return str.split(" ").length
+  return str.trim().split(/\s+/).length
 }
